@@ -12,7 +12,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug",
-            "executable": "c:/Users/b___b/OneDrive/CP project/PlatformIO/Projects/Mqtt2/.pio/build/d1_mini/firmware.elf",
+            "executable": "c:/Users/b___b/Desktop/ThesisMQTT/.pio/build/d1_mini/firmware.elf",
             "projectEnvName": "d1_mini",
             "toolchainBinDir": "C:/Users/b___b/.platformio/packages/toolchain-xtensa/bin",
             "internalConsoleOptions": "openOnSessionStart",
@@ -25,7 +25,7 @@
             "type": "platformio-debug",
             "request": "launch",
             "name": "PIO Debug (skip Pre-Debug)",
-            "executable": "c:/Users/b___b/OneDrive/CP project/PlatformIO/Projects/Mqtt2/.pio/build/d1_mini/firmware.elf",
+            "executable": "c:/Users/b___b/Desktop/ThesisMQTT/.pio/build/d1_mini/firmware.elf",
             "projectEnvName": "d1_mini",
             "toolchainBinDir": "C:/Users/b___b/.platformio/packages/toolchain-xtensa/bin",
             "internalConsoleOptions": "openOnSessionStart"
