@@ -23,8 +23,8 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 //Time Variable
-const byte interruptPin = 5;
-volatile byte state = LOW;
+const byte interruptPin = D2;
+int state = 0;
 unsigned long startTimeMicros = 0;
 unsigned long endTimeMicros = 0;
 unsigned long deltaTime = 0;
@@ -66,6 +66,11 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   Serial.println();
 }
 
+void IRAM_ATTR interruptHanddler(){
+  Serial.println("change state");
+  startTimeMicros = micros();
+}
+
 void setup()
 {
   delay(10);
@@ -75,6 +80,11 @@ void setup()
 
   client.setServer(mqtt_server, 1883);
   client.setCallback(mqttCallback);
+
+  // Interrupt
+  delay(1000);
+  pinMode(interruptPin, INPUT_PULLUP);
+  attachInterrupt(interruptPin,interruptHanddler, CHANGE);
 }
 
 void loop()
@@ -82,4 +92,6 @@ void loop()
   if (!client.connected())
     reconnect();
   client.loop();
+  if (startTimeMicros > 0)
+  Serial.print("done"); 
 }

@@ -20,8 +20,8 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // Interrupt
-const byte interruptPin = 5;
-volatile byte state = LOW;
+const byte interruptPin = D2;
+int state = 0;
 
 
 char buffer[30];
@@ -38,11 +38,12 @@ void setup()
       delay(500);
       Serial.print(".");
     }
+    pinMode(interruptPin, OUTPUT);
     Serial.print("wifi connneccted!");
     client.setServer(mqtt_server, 1883);
     Serial.print("connecting To MQTT");
     delay(1000);
-
+    digitalWrite(interruptPin, LOW);
 }
 
 void reconnect()
@@ -67,14 +68,13 @@ void mqttPublish()
 {
     if (client.connected())
     {
-        Serial.print("client connected");
         if (count == 0)
         {
             sprintf(buffer, "%s" ,topicName);
             client.publish(buffer, String(messege).c_str(), false);
-            //state = !state;
+            digitalWrite(interruptPin, HIGH);
             Serial.print("Message sent");
-            //digitalWrite(interruptPin, state);
+            Serial.print("interrup set to low");
             delay(5000);
             count = 1;
         }
