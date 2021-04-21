@@ -54,21 +54,20 @@ void reconnect() {
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived on topic: ");
-  Serial.print(topic);
-  Serial.print(". Message: ");
-  String messageTemp;
-  
-  for (int i = 0; i < length; i++) {
-    Serial.print((char)payload[i]);
-    messageTemp += (char)payload[i];
+  endTimeMicros = millis();
+  if (strcmp(topic, servoTopic)== 0){
+    for (int i = 0; i < length; i++) {
+      Serial.print((char)payload[i]);
+    }
+    Serial.println();
   }
-  Serial.println();
+  deltaTime = endTimeMicros - startTimeMicros;
+  Serial.println(deltaTime);
 }
 
 void IRAM_ATTR interruptHanddler(){
+  startTimeMicros = millis();
   Serial.println("change state");
-  startTimeMicros = micros();
 }
 
 void setup()
@@ -84,7 +83,7 @@ void setup()
   // Interrupt
   delay(1000);
   pinMode(interruptPin, INPUT_PULLUP);
-  attachInterrupt(interruptPin,interruptHanddler, CHANGE);
+  attachInterrupt(interruptPin,interruptHanddler, RISING);
 }
 
 void loop()
@@ -92,6 +91,5 @@ void loop()
   if (!client.connected())
     reconnect();
   client.loop();
-  if (startTimeMicros > 0)
-  Serial.print("done"); 
+
 }

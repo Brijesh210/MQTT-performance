@@ -68,15 +68,12 @@ void mqttPublish()
 {
     if (client.connected())
     {
-        if (count == 0)
         {
             sprintf(buffer, "%s" ,topicName);
             client.publish(buffer, String(messege).c_str(), false);
             digitalWrite(interruptPin, HIGH);
-            Serial.print("Message sent");
-            Serial.print("interrup set to low");
             delay(5000);
-            count = 1;
+            digitalWrite(interruptPin, LOW);
         }
     }
 }
