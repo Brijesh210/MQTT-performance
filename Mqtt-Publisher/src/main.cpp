@@ -2,16 +2,25 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+// Uni
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2021"
 
 #define wifi_ssid "Ondraszek"
 #define wifi_password "340@brijesh"
 #define mqtt_server "157.158.56.54"
 #define mqtt_user "vrel"
 #define mqtt_password "vrel2018"
-#define MQTTClientName "brijesh"
 
+// MQTT topic name (change it to" BrijeshPUB1")
+#define MQTTClientName "BrijeshPUB"
 #define topicName "/vrel/brijesh/temp"
-#define lastWillTopic "/vrel/brijesh/lastwill"
+
+
+#define lastWillTopic "/lastwill/temp"
 #define lastWillMessage "off"
 #define mqttWelcomeMessage "on"
 #define messege "Hello World"
@@ -21,30 +30,16 @@ PubSubClient client(espClient);
 
 // Interrupt
 const byte interruptPin = D2;
-int state = 0;
+byte state = LOW;
 
+unsigned long startTimeMicros = 0;
+unsigned long endTimeMicros = 0;
+unsigned long deltaTime = 0;
+unsigned long deltaTime2 = 0;
 
 char buffer[30];
 char buffer2[30];
 int count = 0;
-
-void setup()
-{
-    delay(10);
-    Serial.begin(9600);
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(wifi_ssid, wifi_password);
-    while (WiFi.status() != WL_CONNECTED) {
-      delay(500);
-      Serial.print(".");
-    }
-    pinMode(interruptPin, OUTPUT);
-    Serial.print("wifi connneccted!");
-    client.setServer(mqtt_server, 1883);
-    Serial.print("connecting To MQTT");
-    delay(1000);
-    digitalWrite(interruptPin, LOW);
-}
 
 void reconnect()
 {
@@ -65,17 +60,44 @@ void reconnect()
 }
 
 void mqttPublish()
-{
+{   
     if (client.connected())
     {
-        {
-            sprintf(buffer, "%s" ,topicName);
-            client.publish(buffer, String(messege).c_str(), false);
-            digitalWrite(interruptPin, HIGH);
-            delay(5000);
-            digitalWrite(interruptPin, LOW);
+        sprintf(buffer, "%s" ,topicName);
+        client.publish(buffer, String(messege).c_str(), false);
+
+        digitalWrite(interruptPin, state);
+        Serial.println("msg sent");
+        delay(1000);
+        if (state == HIGH ){
+            state = LOW;
+        }else{
+            state = HIGH;
         }
     }
+}
+void setup()
+{
+    //Serial
+    delay(10);
+    Serial.begin(9600);
+
+    //WIFI
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(wifi_ssid, wifi_password);
+    while (WiFi.status() != WL_CONNECTED) {
+      delay(500);
+      Serial.print(".");
+    }
+    Serial.print("wifi connneccted!");
+    delay(1000);
+
+    //Interrupt pin Mode
+    pinMode(interruptPin, OUTPUT);
+    digitalWrite(interruptPin, LOW);
+
+    //MQTT
+    client.setServer(mqtt_server, 1883);
 }
 void loop()
 {

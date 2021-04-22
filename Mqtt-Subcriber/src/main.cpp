@@ -2,15 +2,22 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+//Not working at uni, (I haven't change client name at home , but try it with different name)
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2021"
+
+// working 
 #define wifi_ssid "Ondraszek"
 #define wifi_password "340@brijesh"
-
 #define mqtt_server "157.158.56.54"
 #define mqtt_user "vrel"
 #define mqtt_password "vrel2018"
 
-// MQTT messages
-#define MQTTClientName "BrijeshFromVREL9"
+// MQTT messages (change it to "BrijeshSUB1")
+#define MQTTClientName "BrijeshSUB"
 #define servoTopic "/vrel/brijesh/temp"
 
 //MQTT last will
@@ -41,8 +48,8 @@ void setup_wifi() {
   }
 }
 
-void reconnect() {
-  // Loop until we're reconnected
+void reconnect()
+{
   while (!client.connected()) {
     if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage)) {
       client.subscribe(servoTopic);
@@ -67,7 +74,7 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
 void IRAM_ATTR interruptHanddler(){
   startTimeMicros = millis();
-  Serial.println("change state");
+  Serial.print("change state");
 }
 
 void setup()
@@ -83,13 +90,14 @@ void setup()
   // Interrupt
   delay(1000);
   pinMode(interruptPin, INPUT_PULLUP);
-  attachInterrupt(interruptPin,interruptHanddler, RISING);
+  attachInterrupt(interruptPin,interruptHanddler, CHANGE);
 }
 
 void loop()
 { 
-  if (!client.connected())
+  if (!client.connected()){
     reconnect();
+  }
   client.loop();
 
 }
