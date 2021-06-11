@@ -17,7 +17,7 @@
 
 // MQTT topic name (change it to" BrijeshPUB1")
 #define MQTTClientName "BrijeshPUB"
-#define topicName "/vrel/brijesh/temp"
+#define topicName "/vrel/brijesh/temp/"
 
 
 #define lastWillTopic "/lastwill/temp"
@@ -31,11 +31,12 @@ PubSubClient client(espClient);
 // Interrupt
 const byte interruptPin = D2;
 byte state = LOW;
+boolean flag = true;
 
-unsigned long startTimeMicros = 0;
-unsigned long endTimeMicros = 0;
-unsigned long deltaTime = 0;
-unsigned long deltaTime2 = 0;
+long startTimeMicros = 0;
+long endTimeMicros = 0;
+long deltaTime = 0;
+long deltaTime2 = 0;
 
 char buffer[30];
 char buffer2[30];
@@ -63,17 +64,18 @@ void mqttPublish()
 {   
     if (client.connected())
     {
-        sprintf(buffer, "%s" ,topicName);
-        client.publish(buffer, String(messege).c_str(), false);
-
-        digitalWrite(interruptPin, state);
-        Serial.println("msg sent");
-        delay(1000);
-        if (state == HIGH ){
-            state = LOW;
-        }else{
-            state = HIGH;
+        for(int i = 0 ; i < 100 ; i++){
+            sprintf(buffer, "%s%d" ,topicName, i);
+            client.publish(buffer, String(millis()).c_str(), false);
         }
+        // digitalWrite(interruptPin, state);
+        // Serial.println("msg sent");
+        // delay(1000);
+        // if (state == HIGH ){
+        //     state = LOW;
+        // }else{
+        //     state = HIGH;
+        // }
     }
 }
 void setup()
@@ -89,12 +91,13 @@ void setup()
       delay(500);
       Serial.print(".");
     }
+    
     Serial.print("wifi connneccted!");
     delay(1000);
 
     //Interrupt pin Mode
     pinMode(interruptPin, OUTPUT);
-    digitalWrite(interruptPin, LOW);
+    //digitalWrite(interruptPin, LOW);
 
     //MQTT
     client.setServer(mqtt_server, 1883);
@@ -105,5 +108,16 @@ void loop()
         reconnect();
 
     client.loop();
-    mqttPublish();    
+    if(flag){
+        for(int i = 0 ; i < 10; ++i){
+            digitalWrite(interruptPin, state);
+            mqttPublish();
+            if (state == LOW)
+                state = HIGH;
+            else
+                state = LOW;
+            delay(500);
+            flag = false;
+        }
+    }
 }

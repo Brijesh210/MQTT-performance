@@ -18,7 +18,7 @@
 
 // MQTT messages (change it to "BrijeshSUB1")
 #define MQTTClientName "BrijeshSUB"
-#define servoTopic "/vrel/brijesh/temp"
+#define servoTopic "/vrel/brijesh/temp/+"
 
 //MQTT last will
 #define lastWillTopic "/sut/aeii/iot-open.eu/vrel/node9/state"
@@ -32,6 +32,10 @@ PubSubClient client(espClient);
 //Time Variable
 const byte interruptPin = D2;
 int state = 0;
+bool flag = true;
+bool flagInterrupt = false;
+
+
 unsigned long startTimeMicros = 0;
 unsigned long endTimeMicros = 0;
 unsigned long deltaTime = 0;
@@ -61,20 +65,27 @@ void reconnect()
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  endTimeMicros = millis();
-  if (strcmp(topic, servoTopic)== 0){
-    for (int i = 0; i < length; i++) {
-      Serial.print((char)payload[i]);
+  if (startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
+    if (strcmp(topic, servoTopic)== 0){
+      endTimeMicros = millis();
+      Serial.print("msg...");
     }
-    Serial.println();
+    endTimeMicros = millis();
+    deltaTime = endTimeMicros - startTimeMicros;
+    Serial.print("time: ");
+    Serial.println(deltaTime);
+    startTimeMicros = 0;
+    endTimeMicros = 0;
+    flagInterrupt = false;
+    Serial.println("---");
   }
-  deltaTime = endTimeMicros - startTimeMicros;
-  Serial.println(deltaTime);
 }
 
 void IRAM_ATTR interruptHanddler(){
   startTimeMicros = millis();
-  Serial.print("change state");
+  Serial.print("start...");
+  flagInterrupt = true;
+  endTimeMicros = 0;
 }
 
 void setup()
@@ -83,7 +94,6 @@ void setup()
   Serial.begin(9600);
   setup_wifi();
   Serial.println("WIFI connected");
-
   client.setServer(mqtt_server, 1883);
   client.setCallback(mqttCallback);
 
@@ -99,5 +109,4 @@ void loop()
     reconnect();
   }
   client.loop();
-
 }
