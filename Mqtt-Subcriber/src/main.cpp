@@ -2,6 +2,8 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
+
+
 //Not working at uni, (I haven't change client name at home , but try it with different name)
 // #define wifi_ssid "BrijeshWiFi"
 // #define wifi_password "IoTlab32768"
@@ -18,7 +20,11 @@
 
 // MQTT messages (change it to "BrijeshSUB1")
 #define MQTTClientName "BrijeshSUB"
-#define servoTopic "/vrel/brijesh/temp/+"
+#define servoTopic "/vrel/brijes/+/+/#"
+#define servoTopic1 "/vrel/brijesh/temp/1"
+#define servoTopic2 "/vrel/brijesh/temp/2"
+
+
 
 //MQTT last will
 #define lastWillTopic "/sut/aeii/iot-open.eu/vrel/node9/state"
@@ -34,12 +40,16 @@ const byte interruptPin = D2;
 int state = 0;
 bool flag = true;
 bool flagInterrupt = false;
+bool flag3 = false;
 
 
 unsigned long startTimeMicros = 0;
 unsigned long endTimeMicros = 0;
 unsigned long deltaTime = 0;
 int n;
+
+char buffer[30];
+char buffer2[30];
 
 void setup_wifi() {
   delay(10);
@@ -56,7 +66,7 @@ void reconnect()
 {
   while (!client.connected()) {
     if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage)) {
-      client.subscribe(servoTopic);
+      client.subscribe(servoTopic1);
       Serial.print("subcribed..");
     } else {
       delay(5000);
@@ -65,19 +75,21 @@ void reconnect()
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  if (startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
-    if (strcmp(topic, servoTopic)== 0){
-      endTimeMicros = millis();
-      Serial.print("msg...");
+  if (strcmp(topic,servoTopic1)==0 && startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
+    for (int i = 0; i <= 20 ; i++) {
+      Serial.print(topic[i]);
     }
-    endTimeMicros = millis();
-    deltaTime = endTimeMicros - startTimeMicros;
-    Serial.print("time: ");
-    Serial.println(deltaTime);
-    startTimeMicros = 0;
-    endTimeMicros = 0;
-    flagInterrupt = false;
-    Serial.println("---");
+      endTimeMicros = millis();
+      deltaTime = endTimeMicros - startTimeMicros;
+      Serial.print("time: ");
+      Serial.println(deltaTime);
+      startTimeMicros = 0;
+      endTimeMicros = 0;
+      flagInterrupt = false;
+      Serial.println("---"); 
+  }
+  if(strcmp(topic,servoTopic2)==0){
+    Serial.println("here");
   }
 }
 
@@ -95,6 +107,7 @@ void setup()
   setup_wifi();
   Serial.println("WIFI connected");
   client.setServer(mqtt_server, 1883);
+
   client.setCallback(mqttCallback);
 
   // Interrupt
