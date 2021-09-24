@@ -1,28 +1,28 @@
+#include <ArduinoJson.h>
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-
-
 //Not working at uni, (I haven't change client name at home , but try it with different name)
-// #define wifi_ssid "BrijeshWiFi"
-// #define wifi_password "IoTlab32768"
-// #define mqtt_server "192.168.50.54"
-// #define mqtt_user "vrel"
-// #define mqtt_password "vrel2021"
+#define wifi_ssid "BrijeshWiFi"
+#define wifi_password "IoTlab32768"
+#define mqtt_server "192.168.50.54"
+#define mqtt_user "vrel"
+#define mqtt_password "vrel2021"
 
 // working 
-#define wifi_ssid "Ondraszek"
-#define wifi_password "340@brijesh"
-#define mqtt_server "157.158.56.54"
-#define mqtt_user "vrel"
-#define mqtt_password "vrel2018"
+// #define wifi_ssid "Kujawska"
+// #define wifi_password "17@brijesh"
+// #define mqtt_server "157.158.56.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2018"
 
 // MQTT messages (change it to "BrijeshSUB1")
 #define MQTTClientName "BrijeshSUB"
 #define servoTopic "/vrel/brijes/+/+/#"
 #define servoTopic1 "/vrel/brijesh/temp/1"
 #define servoTopic2 "/vrel/brijesh/temp/2"
+#define topicForSave "vrel/brijesh/save"
 
 
 
@@ -51,6 +51,16 @@ int n;
 char buffer[30];
 char buffer2[30];
 
+char bufferSave1[100];
+char bufferSave2[600];
+
+StaticJsonDocument<600> doc;
+char JSONBuffer[600];
+bool flag12 = true;
+int count12 = 0;
+JsonArray ResultValues = doc.createNestedArray("Results");
+
+
 void setup_wifi() {
   delay(10);
   WiFi.mode(WIFI_STA);
@@ -74,22 +84,50 @@ void reconnect()
   } 
 }
 
-void mqttCallback(char* topic, byte* payload, unsigned int length) {
-  if (strcmp(topic,servoTopic1)==0 && startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
-    for (int i = 0; i <= 20 ; i++) {
-      Serial.print(topic[i]);
-    }
-      endTimeMicros = millis();
-      deltaTime = endTimeMicros - startTimeMicros;
-      Serial.print("time: ");
-      Serial.println(deltaTime);
-      startTimeMicros = 0;
-      endTimeMicros = 0;
-      flagInterrupt = false;
-      Serial.println("---"); 
+void mqttPublish()
+{   
+  if (client.connected())
+  {
+    serializeJson(doc, JSONBuffer);
+    delay(10);
+    sprintf(bufferSave1, "%s" ,topicForSave);
+    sprintf(bufferSave2, "%s" , JSONBuffer);
+    client.publish(bufferSave1, bufferSave2, false);
+    ResultValues.clear();
+    ResultValues.end();
   }
+}
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  
+  if (strcmp(topic,servoTopic1)==0 && startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
+
+    // for (int i = 0; i <= 20 ; i++) {
+    //   Serial.print(topic[i]);
+    // }
+    endTimeMicros = millis();
+    deltaTime = endTimeMicros - startTimeMicros;
+    Serial.print("time: ");
+    Serial.println(deltaTime);
+    ResultValues.begin();
+    ResultValues.add(deltaTime);
+    serializeJson(doc, Serial);
+
+    startTimeMicros = 0;
+    endTimeMicros = 0;
+    flagInterrupt = false;
+    Serial.println("---"); 
+    count12++;
+  }
+
   if(strcmp(topic,servoTopic2)==0){
     Serial.println("here");
+  }
+  
+  if(count12 >= 50){
+    Serial.println();
+    mqttPublish();
+    Serial.println("Published");
+    count12 = 0;
   }
 }
 
@@ -107,7 +145,6 @@ void setup()
   setup_wifi();
   Serial.println("WIFI connected");
   client.setServer(mqtt_server, 1883);
-
   client.setCallback(mqttCallback);
 
   // Interrupt

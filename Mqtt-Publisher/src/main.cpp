@@ -3,17 +3,17 @@
 #include <PubSubClient.h>
 
 // Uni
-// #define wifi_ssid "BrijeshWiFi"
-// #define wifi_password "IoTlab32768"
-// #define mqtt_server "192.168.50.54"
-// #define mqtt_user "vrel"
-// #define mqtt_password "vrel2021"
-
-#define wifi_ssid "Ondraszek"
-#define wifi_password "340@brijesh"
-#define mqtt_server "157.158.56.54"
+#define wifi_ssid "BrijeshWiFi"
+#define wifi_password "IoTlab32768"
+#define mqtt_server "192.168.50.54"
 #define mqtt_user "vrel"
-#define mqtt_password "vrel2018"
+#define mqtt_password "vrel2021"
+
+// #define wifi_ssid "Kujawska"
+// #define wifi_password "17@brijesh"
+// #define mqtt_server "157.158.56.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2018"
 
 // MQTT topic name (change it to" BrijeshPUB1")
 #define MQTTClientName "BrijeshPUB"
@@ -23,7 +23,7 @@
 #define lastWillTopic "/lastwill/temp"
 #define lastWillMessage "off"
 #define mqttWelcomeMessage "on"
-const char *messege = "collfgbgsskslrkfnalksjnfjkdhglkjashfgkljaakjsldghlkjashgkljashfgjlkahsfkjghaslkfjgalksjgkalsjdhflkjashdfkljasjdflakjsdgasjkndgasnflkjwanrlkjgqbwrgjbqwlkrjbgkqwljbglkqjwerbglkjqwrbgkljbdlgjkabsklfjdbgaksljfdbgklasjfbglkjasbfgjkabslkfjgbaslkjfbglkajsfgjkasjbdglkjasbdglkjbalgaslkdjgalksjbgasbdglkjabslkjdgbakkgblkajsfbglkajsbdgjabslkfjgbalkjgrrdlkgjahdflkjghaldfjkghlaksdfgsdy";
+const char *messege = "hello world";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -71,7 +71,8 @@ void mqttPublish(int i)
     //    }
 
         sprintf(buffer, "%s%d" ,topicName, 1);
-        sprintf(buffer2, "%s" , messege);
+        // Initial file save
+        //sprintf(buffer2, "%s" , messege);
         client.publish(buffer, buffer2, false);
 
         // digitalWrite(interruptPin, state);
@@ -115,10 +116,10 @@ void loop()
 
     client.loop();
     if(flag){
-        for(int i = 1 ; i <= 10; ++i){
+        for(int i = 1 ; i <= 50; ++i){
             digitalWrite(interruptPin, state);
             mqttPublish(i);
-            delay(500);
+            delay(1000);
             if (state == LOW)
                 state = HIGH;
             else
