@@ -26,10 +26,12 @@ def on_message(client, userdata, message):
 
 Connected = False  # global variable for the state of the connection
 
-broker_address = "192.168.50.54"
+# broker_address = "192.168.50.54"
+broker_address = "157.158.56.54"
 port = 1883
 user = "vrel"
-password = "vrel2021"
+# password = "vrel2021"
+password = "vrel2018"
 
 client = mqttClient.Client("BrijeshSUB1")  # create new instance
 client.username_pw_set(user, password=password)  # set username and password

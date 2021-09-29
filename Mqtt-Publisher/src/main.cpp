@@ -2,18 +2,19 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-// Uni
-#define wifi_ssid "BrijeshWiFi"
-#define wifi_password "IoTlab32768"
-#define mqtt_server "192.168.50.54"
-#define mqtt_user "vrel"
-#define mqtt_password "vrel2021"
-
-// #define wifi_ssid "Kujawska"
-// #define wifi_password "17@brijesh"
-// #define mqtt_server "157.158.56.54"
+// University
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
 // #define mqtt_user "vrel"
-// #define mqtt_password "vrel2018"
+// #define mqtt_password "vrel2021"
+
+// Home
+#define wifi_ssid "Kujawska"
+#define wifi_password "17@brijesh"
+#define mqtt_server "157.158.56.54"
+#define mqtt_user "vrel"
+#define mqtt_password "vrel2018"
 
 // MQTT topic name (change it to" BrijeshPUB1")
 #define MQTTClientName "BrijeshPUB"
@@ -23,7 +24,7 @@
 #define lastWillTopic "/lastwill/temp"
 #define lastWillMessage "off"
 #define mqttWelcomeMessage "on"
-const char *messege = "hello world";
+const char *messege = "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -46,10 +47,10 @@ void reconnect()
 {
     while (!client.connected())
     {
-        if (client.connect(
-                MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
+        // if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
+        if (client.connect(MQTTClientName, mqtt_user, mqtt_password))
         {
-            client.publish(lastWillTopic, mqttWelcomeMessage, false);
+            Serial.print("Mqtt Connected!");
         }
         else
         {
@@ -57,7 +58,6 @@ void reconnect()
             Serial.print("Conneting...");
         }
     }
-    Serial.print("Mqtt Connected!");
 }
 
 void mqttPublish(int i)
@@ -72,7 +72,7 @@ void mqttPublish(int i)
 
         sprintf(buffer, "%s%d" ,topicName, 1);
         // Initial file save
-        //sprintf(buffer2, "%s" , messege);
+        sprintf(buffer2, "%s" , messege);
         client.publish(buffer, buffer2, false);
 
         // digitalWrite(interruptPin, state);
@@ -119,7 +119,7 @@ void loop()
         for(int i = 1 ; i <= 50; ++i){
             digitalWrite(interruptPin, state);
             mqttPublish(i);
-            delay(1000);
+            delay(500);
             if (state == LOW)
                 state = HIGH;
             else

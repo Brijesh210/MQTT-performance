@@ -3,19 +3,19 @@
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 
-//Not working at uni, (I haven't change client name at home , but try it with different name)
-#define wifi_ssid "BrijeshWiFi"
-#define wifi_password "IoTlab32768"
-#define mqtt_server "192.168.50.54"
-#define mqtt_user "vrel"
-#define mqtt_password "vrel2021"
-
-// working 
-// #define wifi_ssid "Kujawska"
-// #define wifi_password "17@brijesh"
-// #define mqtt_server "157.158.56.54"
+// University
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
 // #define mqtt_user "vrel"
-// #define mqtt_password "vrel2018"
+// #define mqtt_password "vrel2021"
+
+// Home 
+#define wifi_ssid "Kujawska"
+#define wifi_password "17@brijesh"
+#define mqtt_server "157.158.56.54"
+#define mqtt_user "vrel"
+#define mqtt_password "vrel2018"
 
 // MQTT messages (change it to "BrijeshSUB1")
 #define MQTTClientName "BrijeshSUB"
@@ -52,10 +52,10 @@ char buffer[30];
 char buffer2[30];
 
 char bufferSave1[100];
-char bufferSave2[600];
+char bufferSave2[6000];
 
-StaticJsonDocument<600> doc;
-char JSONBuffer[600];
+StaticJsonDocument<6000> doc;
+char JSONBuffer[6000];
 bool flag12 = true;
 int count12 = 0;
 JsonArray ResultValues = doc.createNestedArray("Results");
@@ -88,29 +88,23 @@ void mqttPublish()
 {   
   if (client.connected())
   {
-    serializeJson(doc, JSONBuffer);
     delay(10);
     sprintf(bufferSave1, "%s" ,topicForSave);
     sprintf(bufferSave2, "%s" , JSONBuffer);
     client.publish(bufferSave1, bufferSave2, false);
-    ResultValues.clear();
-    ResultValues.end();
   }
 }
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
   
   if (strcmp(topic,servoTopic1)==0 && startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true){
 
-    // for (int i = 0; i <= 20 ; i++) {
-    //   Serial.print(topic[i]);
-    // }
     endTimeMicros = millis();
     deltaTime = endTimeMicros - startTimeMicros;
     Serial.print("time: ");
     Serial.println(deltaTime);
-    ResultValues.begin();
+
     ResultValues.add(deltaTime);
-    serializeJson(doc, Serial);
+    // serializeJson(doc, Serial);
 
     startTimeMicros = 0;
     endTimeMicros = 0;
@@ -123,10 +117,15 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     Serial.println("here");
   }
   
-  if(count12 >= 50){
+  if(count12 == 50){
+    serializeJson(doc, JSONBuffer);
     Serial.println();
+    serializeJson(doc, Serial);
     mqttPublish();
     Serial.println("Published");
+    ResultValues.clear();
+    doc.garbageCollect();
+
     count12 = 0;
   }
 }
