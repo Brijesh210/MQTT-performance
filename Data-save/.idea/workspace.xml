@@ -5,11 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e97415f9-99a2-42cf-9716-07f7e2372f5b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/Data-save.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Data-save.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/data1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/data1.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/save_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/save_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Mqtt-Publisher/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Publisher/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../Mqtt-Subcriber/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Subcriber/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Mqtt-Publisher/platformio.ini" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Publisher/platformio.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Mqtt-Subcriber/platformio.ini" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Subcriber/platformio.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,6 +31,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunManager" selected="Python.save_data">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python">

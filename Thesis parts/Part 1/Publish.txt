@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
@@ -60,21 +61,20 @@ void reconnect()
     }
 }
 
-void mqttPublish()
+void mqttPublish(int i)
 {   
     if (client.connected())
     {
+    //     for( int i = 1; i <= 100 ; i++){
+    //         sprintf(buffer, "%s%d" ,topicName, i);
+    //         sprintf(buffer2, "%d" , i);
+    //         client.publish(buffer, buffer2, false);
+    //    }
+
+        sprintf(buffer, "%s%d" ,topicName, 1);
+        // Initial file save
         sprintf(buffer2, "%s" , messege);
-        for( int i = 1; i <= 10 ; i++){
-            sprintf(buffer, "%s%d" ,topicName, i);
-            client.publish(buffer, buffer2, false);
-       }
-
-
-        // sprintf(buffer, "%s%d" ,topicName, i);
-        // // Initial file save
-        // sprintf(buffer2, "%s" , messege);
-        // client.publish(buffer, buffer2, false);
+        client.publish(buffer, buffer2, false);
 
         // digitalWrite(interruptPin, state);
         // Serial.println("msg sent");
@@ -117,14 +117,16 @@ void loop()
 
     client.loop();
     if(flag){
-        digitalWrite(interruptPin, state);
-        if(state == LOW){
-            mqttPublish();
-            state = HIGH;
+        for(int i = 1 ; i <= 50; ++i){
             digitalWrite(interruptPin, state);
+            mqttPublish(i);
+            delay(500);
+            if (state == LOW)
+                state = HIGH;
+            else
+                state = LOW;
+            flag = false;
         }
-        Serial.print("Messages published on multiple topic!");
-        flag = false;
     }
 }
 
