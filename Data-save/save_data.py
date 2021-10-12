@@ -39,10 +39,7 @@ client.on_connect = on_connect  # attach function to callback
 client.on_message = on_message  # attach function to callback
 client.connect(broker_address, port, 60)  # connect
 client.subscribe("vrel/brijesh/save")  # subscribe
-# client.subscribe("$SYS/broker/store/messages/count")
-# client.subscribe("$SYS/broker/store/messages/bytes")  # subscribe
 
 print("subscribed")
-
 client.loop_forever()# then keep listening forever
 time.sleep(10)
