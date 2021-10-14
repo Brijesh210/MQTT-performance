@@ -21,7 +21,7 @@
 #define topicName "/vrel/"
 #define topicSeprator "/"
 
-const char *messege = "9999999999";
+const char *messege = "1vhvkjhkvvvkjhiiimv";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -31,7 +31,7 @@ const byte interruptPin = D2;
 byte state = LOW;
 boolean flag = true;
 
-const int totalSampleToPublish = 1;
+const int totalSampleToPublish = 50;
 const int LEVEL_1 = 1;
 const int LEVEL_2 = 1;
 const int LEVEL_3 = 1;
@@ -61,11 +61,11 @@ void mqttPublish()
     if (client.connected())
     {
         sprintf(messageBuffer, "%s", messege);
-        for (int i = 1; i <= LEVEL_1; i++)
+        for (int i = 1; i <= LEVEL_1; ++i)
         {
-            for (int j = 1; j <= LEVEL_2; j++)
+            for (int j = 1; j <= LEVEL_2; ++j)
             {
-                for (int k = 1; k <= LEVEL_3; k++)
+                for (int k = 1; k <= LEVEL_3; ++k)
                 {
                     sprintf(topicBuffer, "%s%d%s%d%s%d", topicName, i, topicSeprator, j, topicSeprator, k);
                     client.publish(topicBuffer, messageBuffer, false);
@@ -106,9 +106,13 @@ void loop()
     }
     client.loop();
     if (count < totalSampleToPublish)
-    {   
-        
+    {
+        digitalWrite(interruptPin, state);
         mqttPublish();
+        state = HIGH;
+        digitalWrite(interruptPin, state);
+        state = LOW;
+        delay(1000);
         count++;
     }
 }

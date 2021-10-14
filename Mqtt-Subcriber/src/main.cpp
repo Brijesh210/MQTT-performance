@@ -50,8 +50,8 @@ unsigned long startTimeMicros2 = 0;
 unsigned long endTimeMicros = 0;
 unsigned long deltaTime = 0;
 
-const int totalTopicTohandle = 10;
-const int totalSampleToCollect = 5;
+const int totalTopicTohandle = 1;
+const int totalSampleToCollect = 50;
 
 char bufferSave1[100];
 char bufferSave2[6000];
@@ -107,16 +107,12 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
     if (startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true)
     {
-        Serial.println(topic);
         count++;
 
-        if (count == totalTopicTohandle)
+        if (count == totalTopicTohandle && flagInterrupt2 == true)
         {
             endTimeMicros = millis();
 
-            // Start: first interrrupt , start2 = 2nd interrupt (when publisher stop publishing message)
-            // End - start2 (Final = Delta - Detla2)
-            // Delta = end - start , Delta2 = start2 - start
             deltaTime = endTimeMicros - startTimeMicros2;
             Serial.println(deltaTime);
             Serial.print("time: ");
@@ -129,6 +125,8 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
             deltaTime = 0;
 
             flagInterrupt = false;
+            flagInterrupt2 = false;
+
             Serial.println();
             count12++;
             count = 0;
@@ -142,7 +140,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
             Serial.println("Published");
             ResultValues.clear();
             doc.garbageCollect();
-            count12 =0;
+            count12 = 0;
         }
     }
 }
@@ -152,13 +150,11 @@ void IRAM_ATTR interruptHanddler()
     if (digitalRead(interruptPin) == 0)
     {
         startTimeMicros = millis();
-        Serial.println("1st Interrupt");
         flagInterrupt = true;
     }
-    if (digitalRead(interruptPin) == 1)
+    else
     {
         startTimeMicros2 = millis();
-        Serial.println("2nd Interrupt");
         flagInterrupt2 = true;
     }
 }

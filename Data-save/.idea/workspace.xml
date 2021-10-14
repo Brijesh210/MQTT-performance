@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e97415f9-99a2-42cf-9716-07f7e2372f5b" name="Changes" comment="" />
+    <list default="true" id="e97415f9-99a2-42cf-9716-07f7e2372f5b" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/data1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/data/data1.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Mqtt-Publisher/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Publisher/src/main.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Mqtt-Subcriber/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../Mqtt-Subcriber/src/main.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
