@@ -82,57 +82,8 @@ void reconnect()
     {
         if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
         {
-            startTimeMicros = micros();
             client.subscribe(topic_1);
-            Serial.print("subcribed.. 1");
-            endTimeMicros = micros();
-            if (startTimeMicros > 0)
-            {
-                Serial.print("Time 1: ");
-                Serial.println(endTimeMicros - startTimeMicros);
-            }
-            client.unsubscribe(topic_1);
-            startTimeMicros = 0;
-            endTimeMicros = 0;
-            delay(100);
-            //---------------------
-            startTimeMicros = micros();
-            client.subscribe(topic_2);
-            Serial.print("subcribed.. 2");
-            endTimeMicros = micros();
-            if (startTimeMicros > 0)
-            {
-                Serial.print("Time 2 : ");
-                Serial.println(endTimeMicros - startTimeMicros);
-            }
-            client.unsubscribe(topic_2);
-            startTimeMicros = 0;
-            endTimeMicros = 0;
-            delay(100);
-            //--------------------------
-            startTimeMicros = micros();
-            client.subscribe(topic_3);
-            Serial.print("subcribed.. 3");
-            endTimeMicros = micros();
-            if (startTimeMicros > 0)
-            {
-                Serial.print("Time 3 : ");
-                Serial.println(endTimeMicros - startTimeMicros);
-            }
-            client.unsubscribe(topic_3);
-            startTimeMicros = 0;
-            endTimeMicros = 0;
-            delay(100);
-            //----------------------------
-            startTimeMicros = micros();
-            client.subscribe(topic_4);
-            Serial.print("subcribed.. 4");
-            endTimeMicros = micros();
-            if (startTimeMicros > 0)
-            {
-                Serial.print("Time 4: ");
-                Serial.println(endTimeMicros - startTimeMicros);
-            }
+            Serial.print("Subcribed");
         }
         else
         {
@@ -154,7 +105,46 @@ void mqttPublish()
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
-    
+    if (startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true)
+    {
+        Serial.println(topic);
+        count++;
+
+        if (count == totalTopicTohandle)
+        {
+            endTimeMicros = millis();
+
+            // Start: first interrrupt , start2 = 2nd interrupt (when publisher stop publishing message)
+            // End - start2 (Final = Delta - Detla2)
+            // Delta = end - start , Delta2 = start2 - start
+            deltaTime = endTimeMicros - startTimeMicros2;
+            Serial.println(deltaTime);
+            Serial.print("time: ");
+            Serial.print(deltaTime);
+            ResultValues.add(deltaTime);
+
+            startTimeMicros = 0;
+            startTimeMicros2 = 0;
+            endTimeMicros = 0;
+            deltaTime = 0;
+
+            flagInterrupt = false;
+            Serial.println();
+            count12++;
+            count = 0;
+        }
+        if (count12 == totalSampleToCollect)
+        {
+            serializeJson(doc, JSONBuffer);
+            Serial.println();
+            serializeJson(doc, Serial);
+            mqttPublish();
+            Serial.println("Published");
+            ResultValues.clear();
+            doc.garbageCollect();
+            count12 =0;
+        }
+    }
 }
 
 void IRAM_ATTR interruptHanddler()

@@ -106,7 +106,8 @@ void loop()
     }
     client.loop();
     if (count < totalSampleToPublish)
-    {
+    {   
+        
         mqttPublish();
         count++;
     }
