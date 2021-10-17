@@ -16,11 +16,10 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, message):
-    print("message received  ", str(message.payload.decode("utf-8")), \
-          "topic", message.topic)
+    print("message received  ", str(message.payload.decode("utf-8")), "topic", message.topic)
 
     with open('data\\data1.txt', 'a+') as f:
-        f.write("Message received: " + str(message.payload.decode("utf-8")) + "\n")
+        f.write(str(message.payload.decode("utf-8")) + "\n")
     f.close()
 
 
