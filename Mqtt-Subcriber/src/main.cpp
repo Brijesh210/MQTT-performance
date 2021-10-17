@@ -80,7 +80,7 @@ void reconnect()
 {
     while (!client.connected())
     {
-        if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
+        if (client.connect(MQTTClientName, mqtt_user, mqtt_password))
         {
             client.subscribe(topic_1);
             Serial.print("Subcribed");
@@ -168,6 +168,7 @@ void setup()
     client.setServer(mqtt_server, 1883);
     client.setCallback(mqttCallback);
 
+    client.setBufferSize(1024);
     // Interrupt
     delay(1000);
     pinMode(interruptPin, INPUT_PULLUP);

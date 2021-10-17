@@ -21,7 +21,8 @@
 #define topicName "/vrel/"
 #define topicSeprator "/"
 
-const char *messege = "1vhvkjhkvvvkjhiiimv";
+const char *messege = "12345678"; // 8 bytes
+char *mes1;  // 1024 bytes = 1 kb
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -30,6 +31,9 @@ PubSubClient client(espClient);
 const byte interruptPin = D2;
 byte state = LOW;
 boolean flag = true;
+boolean flagw = true;
+boolean flagwe = true;
+
 
 const int totalSampleToPublish = 50;
 const int LEVEL_1 = 1;
@@ -37,7 +41,7 @@ const int LEVEL_2 = 1;
 const int LEVEL_3 = 1;
 
 char topicBuffer[150];
-char messageBuffer[512];
+char messageBuffer[2048];
 int count = 0;
 
 void reconnect()
@@ -60,7 +64,14 @@ void mqttPublish()
 {
     if (client.connected())
     {
-        sprintf(messageBuffer, "%s", messege);
+        if(flagwe){
+            Serial.println("");
+            Serial.print("Hello");
+            Serial.print(mes1);
+            flagwe = false;
+        }
+        
+        sprintf(messageBuffer, "%s", mes1);
         for (int i = 1; i <= LEVEL_1; ++i)
         {
             for (int j = 1; j <= LEVEL_2; ++j)
@@ -97,6 +108,17 @@ void setup()
     //digitalWrite(interruptPin, LOW);
 
     client.setServer(mqtt_server, 1883);
+    Serial.print("Override:");
+    Serial.print(client.setBufferSize(1024));
+    Serial.println();
+
+    mes1 = (char*)malloc(1024*sizeof(char));
+    char add = 'a';
+    for (int i = 0; i < 1000; i++)
+    {
+        mes1[i] = add;
+    }
+  
 }
 void loop()
 {
@@ -107,12 +129,17 @@ void loop()
     client.loop();
     if (count < totalSampleToPublish)
     {
+        if (flagw){
+            Serial.print("msg");
+            Serial.print(mes1);
+            flagw = false;
+        }
         digitalWrite(interruptPin, state);
         mqttPublish();
         state = HIGH;
         digitalWrite(interruptPin, state);
         state = LOW;
-        delay(1000);
+        delay(3000);
         count++;
     }
 }
