@@ -3,27 +3,27 @@
 #include <PubSubClient.h>
 
 // University
-#define wifi_ssid "BrijeshWiFi"
-#define wifi_password "IoTlab32768"
-#define mqtt_server "192.168.50.54"
-#define mqtt_user "vrel"
-#define mqtt_password "vrel2021"
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2021"
 
 // Home
-// #define wifi_ssid "Kujawska"
-// #define wifi_password "17@brijesh"
-// #define mqtt_server "157.158.56.54"
-// #define mqtt_user "vrel"
-// #define mqtt_password "vrel2018"
+#define wifi_ssid "Kujawska"
+#define wifi_password "17@brijesh"
+#define mqtt_server "157.158.56.54"
+#define mqtt_user "vrel"
+#define mqtt_password "vrel2018"
 
 // MQTT topic name (change it to" BrijeshPUB1")
-#define MQTTClientName "BrijeshPUB7"
+#define MQTTClientName "BrijeshPUB"
 #define topic_name "brijesh/mqtt/hello/"
 
 // Data point
 #define total_sample 20
-#define payload_size 1
-#define topic_size 8192
+#define payload_size 100
+#define topic_size 10
 
 char *mes1;
 char messageBuffer[payload_size + 1];
@@ -115,7 +115,7 @@ void loop()
         {
             state = HIGH;
         }
-        delay(6000);
+        delay(500);
         count++;
     }
 }

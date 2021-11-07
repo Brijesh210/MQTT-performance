@@ -18,14 +18,21 @@
 // #define mqtt_password "vrel2018"
 
 // MQTT messages (change it to "BrijeshSUB1")
-#define MQTTClientName "BrijeshSUB7"
+#define MQTTClientName "BrijeshSUB"
 #define topicToSubscribe "brijesh/mqtt/hello/+"
 #define topicForSave "vrel/brijesh/save"
+
+//Wildcards Topics
+#define topic_1 "/vrel/1/1/1"
+#define topic_2 "/vrel/1/+/1"
+#define topic_3 "/vrel/#"
+#define topic_4 "/vrel/+/1/#"
+#define topic_compare "/vrel/1/1/1"
 
 //Data point
 #define totalSampleToCollect 20
 #define payload_size 1
-#define topic_size 8192
+#define topic_size 1
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -62,8 +69,8 @@ void reconnect()
     {
         if (client.connect(MQTTClientName, mqtt_user, mqtt_password))
         {
-            client.subscribe(topicToSubscribe);
-            Serial.print("subcribed..");
+            client.subscribe(topic_4);
+            Serial.print("Subscribed");
         }
         else
         {
@@ -85,7 +92,7 @@ void mqttPublish()
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
-    if (startTimeMicros > 0 && endTimeMicros == 0)
+    if (startTimeMicros > 0 && endTimeMicros == 0 && strcmp(topic, topic_compare) == 0)
     {
         count++;
         if (count == topic_size)
@@ -96,14 +103,11 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
             Serial.print("time: ");
             Serial.println(deltaTime);
 
-
             ResultValues.add(deltaTime);
 
             startTimeMicros = 0;
             endTimeMicros = 0;
             deltaTime = 0;
-
-            Serial.println();
             sampleCounter++;
             count = 0;
         }
@@ -123,7 +127,7 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
 
 void IRAM_ATTR interruptHanddler()
 {
-  startTimeMicros = millis();
+    startTimeMicros = millis();
 }
 
 void setup()
@@ -137,7 +141,7 @@ void setup()
 
     delay(100);
     client.setCallback(mqttCallback);
-    
+
     delay(1000);
     pinMode(interruptPin, INPUT_PULLUP);
     attachInterrupt(interruptPin, interruptHanddler, CHANGE);

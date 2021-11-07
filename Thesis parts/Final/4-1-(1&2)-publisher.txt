@@ -1,0 +1,157 @@
+#include <ArduinoJson.h>
+#include <Arduino.h>
+#include <ESP8266WiFi.h>
+#include <PubSubClient.h>
+
+// University
+// #define wifi_ssid "BrijeshWiFi"
+// #define wifi_password "IoTlab32768"
+// #define mqtt_server "192.168.50.54"
+// #define mqtt_user "vrel"
+// #define mqtt_password "vrel2021"
+
+// Home
+#define wifi_ssid "Kujawska"
+#define wifi_password "17@brijesh"
+#define mqtt_server "157.158.56.54"
+#define mqtt_user "vrel"
+#define mqtt_password "vrel2018"
+
+// MQTT topic name (change it to" BrijeshPUB1")
+#define MQTTClientName "BrijeshPUB"
+#define topic_name "brijesh/mqtt/hello/"
+#define topicForSave "vrel/brijesh/save"
+
+// Data point
+#define total_sample 20
+#define topic_size 10
+#define payload_size 10000
+#define totalSampleToCollect 20
+
+int load = payload_size;
+char *mes1;
+
+char messageBuffer[payload_size + 1];
+char topicBuffer[150];
+int count = 0;
+
+unsigned long startTimeMicros = 0;
+unsigned long endTimeMicros = 0;
+unsigned long deltaTime = 0;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+const byte interruptPin = D2;
+byte state = LOW;
+
+char bufferSave1[100];
+char bufferSave2[6000];
+
+StaticJsonDocument<6000> doc;
+char JSONBuffer[6000];
+JsonArray ResultValues = doc.createNestedArray("Results");
+int flag = 0;
+
+void setup_wifi()
+{
+    delay(10);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(wifi_ssid, wifi_password);
+    while (WiFi.status() != WL_CONNECTED)
+    {
+        Serial.print(".");
+        delay(1000);
+    }
+}
+
+void mqttPublishSave()
+{
+    if (client.connected())
+    {
+        delay(10);
+        sprintf(bufferSave1, "%s", topicForSave);
+        sprintf(bufferSave2, "%s", JSONBuffer);
+        client.publish(bufferSave1, bufferSave2, false);
+    }
+}
+
+void reconnect()
+{
+    while (!client.connected())
+    {
+        // if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
+        if (client.connect(MQTTClientName, mqtt_user, mqtt_password))
+        {
+            Serial.print("Mqtt Connected!");
+        }
+        else
+        {
+            delay(5000);
+            Serial.print("Conneting...");
+        }
+    }
+}
+
+void mqttPublish()
+{
+    if (client.connected())
+    {
+        startTimeMicros = micros();
+        client.publish(topic_name, messageBuffer, false);
+        endTimeMicros = micros();
+        Serial.print("time = ");
+        Serial.print(payload_size);
+        Serial.print(" = ");
+        deltaTime = endTimeMicros - startTimeMicros;
+        Serial.println(deltaTime);
+        ResultValues.add(deltaTime);
+    }
+}
+
+void setup()
+{
+    delay(10);
+    Serial.begin(9600);
+    setup_wifi();
+
+    Serial.print("wifi connneccted!");
+    delay(1000);
+
+    pinMode(interruptPin, OUTPUT);
+
+    client.setServer(mqtt_server, 1883);
+    client.setBufferSize((payload_size * 2) + 256);
+
+    char add = 'a';
+    for (int i = 0; i < payload_size; i++)
+    {
+        messageBuffer[i] = add;
+    }
+}
+
+void loop()
+{
+    if (!client.connected())
+    {
+        reconnect();
+    }
+
+    while (count < totalSampleToCollect && flag <= 5)
+    {
+        mqttPublish();
+        delay(1000);
+        count++;
+    }
+    if (count == totalSampleToCollect)
+    {
+        serializeJson(doc, JSONBuffer);
+        Serial.println();
+        serializeJson(doc, Serial);
+        mqttPublishSave();
+        Serial.println("Published");
+        ResultValues.clear();
+        doc.garbageCollect();
+        count = 0;
+        flag ++;
+    }
+}

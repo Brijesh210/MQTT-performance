@@ -17,18 +17,23 @@
 // #define mqtt_password "vrel2018"
 
 // MQTT topic name (change it to" BrijeshPUB1")
-#define MQTTClientName "BrijeshPUB7"
-#define topic_name "brijesh/mqtt/hello/"
+#define MQTTClientName "BrijeshPUB"
+#define topicName "/vrel/"
+#define topicSeprator "/"
 
 // Data point
 #define total_sample 20
 #define payload_size 1
-#define topic_size 8192
+#define topic_size 1
 
-char *mes1;
+int level_1 = 1;
+int level_2 = 1;
+int level_3 = 10;
+
 char messageBuffer[payload_size + 1];
 char topicBuffer[150];
 int count = 0;
+int countResult = 0;
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -68,10 +73,16 @@ void mqttPublish()
 {
     if (client.connected())
     {
-        for (int i = 1; i <= topic_size; i++)
+        for (int i = 1; i <= level_1; ++i)
         {
-            sprintf(topicBuffer, "%s%d", topic_name, i);
-            client.publish(topicBuffer, messageBuffer, false);
+            for (int j = 1; j <= level_2; ++j)
+            {
+                for (int k = 1; k <= level_3; ++k)
+                {
+                    sprintf(topicBuffer, "%s%d%s%d%s%d", topicName, i, topicSeprator, j, topicSeprator, k);
+                    client.publish(topicBuffer, messageBuffer, false);
+                }
+            }
         }
     }
 }
@@ -98,11 +109,13 @@ void setup()
 }
 
 void loop()
-{  if (!client.connected())
+{
+    if (!client.connected())
     {
         reconnect();
     }
     client.loop();
+
     if (count < total_sample)
     {
         digitalWrite(interruptPin, state);
@@ -115,7 +128,7 @@ void loop()
         {
             state = HIGH;
         }
-        delay(6000);
+        delay(1000);
         count++;
     }
 }

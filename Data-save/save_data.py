@@ -18,21 +18,21 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, message):
     print("message received  ", str(message.payload.decode("utf-8")), "topic", message.topic)
 
-    with open('data\\data1.txt', 'a+') as f:
+    with open('data\\data3.txt', 'a+') as f:
         f.write(str(message.payload.decode("utf-8")) + "\n")
     f.close()
 
 
 Connected = False  # global variable for the state of the connection
 
-# broker_address = "192.168.50.54"
-broker_address = "157.158.56.54"
+broker_address = "192.168.50.54"
+# broker_address = "157.158.56.54"
 port = 1883
 user = "vrel"
-# password = "vrel2021"
-password = "vrel2018"
+password = "vrel2021"
+# password = "vrel2018"
 
-client = mqttClient.Client("BrijeshSUB1")  # create new instance
+client = mqttClient.Client("BrijeshSUB5")  # create new instance
 client.username_pw_set(user, password=password)  # set username and password
 client.on_connect = on_connect  # attach function to callback
 client.on_message = on_message  # attach function to callback
