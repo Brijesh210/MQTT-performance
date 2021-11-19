@@ -1,2 +1,0 @@
-ssh://git@gitlab.aei.polsl.pl:2020/brijvar786/msc-2021-brijesh-varsani.git
-git@github.com:Brijesh210/MQTT-performance.git

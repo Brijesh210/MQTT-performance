@@ -19,15 +19,12 @@
 
 // MQTT messages (change it to "BrijeshSUB1")
 #define MQTTClientName "BrijeshSUB"
-#define servoTopic "/vrel/brijes/+/+/#"
-#define topicToSubscribe "/vrel/brijesh/temp/+"
 
+//Wildcards Topics
+#define topicName "brijesh/mqtt/hello"
 #define topicForSave "vrel/brijesh/save"
-
-//MQTT last will
-#define lastWillTopic "/sut/aeii/iot-open.eu/vrel/node9/state"
-#define lastWillMessage "off"
-#define mqttWelcomeMessage "on"
+#define totalSampleToCollect 20
+#define payload_size 10
 
 // WiFi & MQTT
 WiFiClient espClient;
@@ -35,31 +32,20 @@ PubSubClient client(espClient);
 
 //Time Variable
 const byte interruptPin = D2;
-int state = 0;
-
-bool flagInterrupt = false;
-bool flagInterrupt2 = false;
 
 unsigned long startTimeMicros = 0;
-unsigned long startTimeMicros2 = 0;
-
 unsigned long endTimeMicros = 0;
 unsigned long deltaTime = 0;
-
-const int totalTopicTohandle = 10;
-const int totalSampleToCollect = 5;
 
 char bufferSave1[100];
 char bufferSave2[6000];
 
 StaticJsonDocument<6000> doc;
 char JSONBuffer[6000];
-bool flag12 = true;
-int count12 = 0;
-int count = 0;
+int sampleCounter = 0;
 
 JsonArray ResultValues = doc.createNestedArray("Results");
-
+ 
 void setup_wifi()
 {
     delay(10);
@@ -76,10 +62,10 @@ void reconnect()
 {
     while (!client.connected())
     {
-        if (client.connect(MQTTClientName, mqtt_user, mqtt_password, lastWillTopic, 0, true, lastWillMessage))
+        if (client.connect(MQTTClientName, mqtt_user, mqtt_password))
         {
-            client.subscribe(topicToSubscribe);
-            Serial.print("subcribed..");
+            client.subscribe(topicName);
+            Serial.print("Subcribed");
         }
         else
         {
@@ -101,35 +87,27 @@ void mqttPublish()
 
 void mqttCallback(char *topic, byte *payload, unsigned int length)
 {
-    if (startTimeMicros > 0 && endTimeMicros == 0 && flagInterrupt == true)
+    if (strcmp(topic, topicName) == 0 && startTimeMicros > 0 && endTimeMicros == 0)
     {
-        Serial.println(topic);
-        count++;
-
-        if (count == totalTopicTohandle)
+        Serial.println("topic");
+        if (length == payload_size)
         {
-            endTimeMicros = millis();
+            Serial.println("leagth");
 
-            // Start: first interrrupt , start2 = 2nd interrupt (when publisher stop publishing message)
-            // End - start2 (Final = Delta - Detla2)
-            // Delta = end - start , Delta2 = start2 - start
-            deltaTime = endTimeMicros - startTimeMicros2;
-            Serial.println(deltaTime);
+            endTimeMicros = millis();
+            deltaTime = endTimeMicros - startTimeMicros;
+
             Serial.print("time: ");
-            Serial.print(deltaTime);
+            Serial.println(deltaTime);
+
             ResultValues.add(deltaTime);
 
             startTimeMicros = 0;
-            startTimeMicros2 = 0;
             endTimeMicros = 0;
             deltaTime = 0;
-
-            flagInterrupt = false;
-            Serial.println();
-            count12++;
-            count = 0;
+            sampleCounter++;
         }
-        if (count12 == totalSampleToCollect)
+        if (sampleCounter == totalSampleToCollect)
         {
             serializeJson(doc, JSONBuffer);
             Serial.println();
@@ -138,25 +116,14 @@ void mqttCallback(char *topic, byte *payload, unsigned int length)
             Serial.println("Published");
             ResultValues.clear();
             doc.garbageCollect();
-            count12 =0;
+            sampleCounter = 0;
         }
     }
 }
 
 void IRAM_ATTR interruptHanddler()
 {
-    if (digitalRead(interruptPin) == 0)
-    {
-        startTimeMicros = millis();
-        Serial.println("1st Interrupt");
-        flagInterrupt = true;
-    }
-    if (digitalRead(interruptPin) == 1)
-    {
-        startTimeMicros2 = millis();
-        Serial.println("2nd Interrupt");
-        flagInterrupt2 = true;
-    }
+    startTimeMicros = millis();
 }
 
 void setup()
@@ -164,10 +131,14 @@ void setup()
     delay(10);
     Serial.begin(9600);
     setup_wifi();
+
     Serial.println("WIFI connected");
     client.setServer(mqtt_server, 1883);
-    client.setCallback(mqttCallback);
+    client.setBufferSize((payload_size * 2) + 256);
 
+    delay(100);
+
+    client.setCallback(mqttCallback);
     // Interrupt
     delay(1000);
     pinMode(interruptPin, INPUT_PULLUP);
